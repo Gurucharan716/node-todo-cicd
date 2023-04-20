@@ -1,26 +1,26 @@
 pipeline {
     agent {label "dev-agent"}
     stages {
-        stage("code"){
+        stage("code clone") {
             steps {
-                git url: "https://github.com/Gurucharan716/node-todo-cicd.git", branch:"master"
+                git url: "https://github.com/Gurucharan716/node-todo-cicd.git", branch: "master"
             }
         }
-         stage("Buils and Test"){
+          stage("Build and Test") {
             steps {
-                sh "docker build . -t gurucharan22/node-todo-app-cicd:latest"
+                sh "docker build . -t gurucharan22/node-todo-app-new-cicd:latest"
             }
         }
-         stage("Login and Image"){
+           stage("Docker login and push image") {
             steps {
-                echo "logging into docker hub and image"
+                echo "logging in docker hub and pushing image"
                 withCredentials([usernamePassword(credentialsId:"dockerHub",passwordVariable:"dockerHubPassword",usernameVariable:"dockerHubUser")]) {
                     sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
-                    sh "docker push gurucharan22/node-todo-app-cicd:latest"
+                    sh "docker push gurucharan22/node-todo-app-new-cicd:latest"
                 }
             }
         }
-         stage("Deploying"){
+          stage("Deploy") {
             steps {
                 sh "docker-compose down && docker-compose up -d"
             }
